@@ -5,8 +5,8 @@
 - 저자: 조슈아 블로크 (Joshua Bloch)
 
 ### 챕터별 요약정리
-- [1장. 들어가기](./chapter01/chapter01.md)
-- [2장. 객체 생성과 파괴]
+- [1장. 들어가기](./study-effective-java/chapter01/chapter01.md)
+- [2장. 객체 생성과 파괴](./study-effective-java/chapter02/chapter02.md)
 - [3장. 모든 객체의 공통 메서드]
 - [4장. 클래스와 인터페이스]
 - [5장. 제네릭]
