@@ -7,7 +7,7 @@
 ### 챕터별 요약정리
 - [1장. 들어가기](./study-effective-java/chapter01/chapter01.md)
 - [2장. 객체 생성과 파괴](./study-effective-java/chapter02/chapter02.md)
-- [3장. 모든 객체의 공통 메서드]
+- [3장. 모든 객체의 공통 메서드](./study-effective-java/chapter03/chapter03.md)
 - [4장. 클래스와 인터페이스]
 - [5장. 제네릭]
 - [6장. 열거 타입과 애너테이션]
