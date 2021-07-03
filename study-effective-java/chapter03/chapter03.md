@@ -100,4 +100,73 @@
 - 대부분의 `열거 타입`(아이템 34)도 자바가 이미 완벽한 toString을 제공하니 따로 `재정의하지 않아도 된다.`
 - 하위 클래스들이 공유해야 할 문자열 표현이 있는 `추상 클래스`라면 toString을 `재정의해줘야 한다.`
 
+## 아이템 13. clone 재정의는 주의해서 진행하라
+- 새로운 인터페이스를 만들 때는 절대 Cloneable확장해서는 안된다.
+- 새로운 클래스도 이를 구현해서는 안된다. (final 클래스라면 위험이 크지 않지만 성능 최적화 관점에서 검토한 후 문제없을 때만 드물게 허용)
+- 기본 원칙은 `복제 기능은 생성자와 팩터리를 이용하는 게 최고`라는 것
+- 단, `배열`만은 clone 메서드 방식이 `가장 깔끔한`, 이 규칙의 합당한 예외라 할 수 있다.
+- Cloneable 인터페이스는 Object의 protected 메서드인 clone의 동작 방식을 결정한다.
+   - `Cloneable`을 구현한 클래스의 인스턴스에서 `clone`을 호출하면 `그 객체의 필드들을 하나하나 복사한 객체를 반환`한다.
+   - 그렇지 않은 클래스의 인스턴스에서 호출하면 `CloneNotSupportedException`을 던진다.
+   ```java
+     // 가변 상태를 참조하는 클래스용 clone 메서드
+     @Override public Stack clone() {
+       try {
+         Stack result = (Stack) super.clone();
+         result.elements = elements.clone(); // 재귀적 호출, 배열의 clone은 런타임 타입과 컴파일타임 타입 모두가 원본 배열과 똑같은 배열을 반환한다.
+         return result;
+       } catch (CloneNotSupportedException e) {
+         throw new AssertionError();
+       }
+     }
+   ```
+- `HashTable` 내부는 `버킷들의 배열`이고, 각 버킷은 `key-value` 쌍을 담는 `linked list`의 첫 번째 `entry`를 참조한다.
+   - HashTable의 clone의 경우 HashTable.Entry를 재귀적 호출로 clone한다면 복제본은 원본과 같은 연결 리스트를 참조하여 예기치 않게 동작할 수 있다. 
+   - `HashTable.Entry`는 `깊은복사(deep copy)`를 지원하도록 보강되었고 deepCopy를 재귀 호출 대신 반복자를 써서 순회하는 방향으로 구현해야 한다.
+- Cloneable을 구현한 Thread-Safe 클래스를 작성할 때는 clone 메서드 역시 적절히 동기화해줘야 한다(아이템 78)
+- 복사 생성자와 복사 팩터리라는 더 나은 객체 복사 방식을 제공할 수 있다.
+   - `복사 생성자` - 단순히 자신과 같은 클래스의 인스턴스를 인수로 받는 생성자
+     ```java
+     public Yum(Yum yum) { ... };
+     ```
+   - `복사 팩터리` - 복사 생성자를 모방한 정적 팩터리(아이템 1)
+     ```java
+     public static Yum newInstance(Yum yum) { ... };
+     ```
+   - 인터페이스 타입의 인스턴스를 인수로 받는 복사 생성자와 복사 생성자의 명칭은 `변환 생성자`와 `변환 팩터리`이다.
 
+## 아이템 14. Comparable을 구현할지 고려하라
+- `Comparable` 인터페이스에는 `compareTo`라는 유일무이한 메서드가 있다.
+- compareTo 메서드로 수행하는 `동치성 검사`도 equals 규약과 똑같이 `반사성`, `대칭성`, `추이성`을 충족해야 한다.
+- `순서`를 고려해야 하는 값 클래스를 작성한다면 꼭 Comparable 인터페이스를 구현하여, 그 인스턴스들을 쉽게 정렬하고, 검색하고, `비교 기능`을 제공하는 컬렉션과 어우러지도록 해야 한다.
+   - 비교를 활용하는 클래스의 예 - TreeSet, TreeMap
+   - 검색과 정렬 알고리즘을 활용하는 유틸리티 클래스 - Collections, Arrays
+      ```java
+      // Comparable을 구현한 객체들의 배열은 아래와 같이 정렬 
+      Arrays.sort(a);
+      ```
+- `compareTo` 메서드에서 필드의 값을 비교할 때 <와 > 연산자는 쓰지 말아야 한다.
+   - 그 대신 박싱된 기본 타입 클래스가 제공하는 `정적 compare 메서드`나 Comparator 인터페이스가 제공하는 `비교자 생성 메서드`를 사용하자.
+   ```java
+    // 기본 타입 필드가 여럿일 때의 비교자
+    public int compareTo(PhoneNumber pn) {
+      int result = Short.compare(areaCode, pn.areaCode);  // 가장 중요한 필드
+      if (result == 0) {
+        result = Short.compare(prefix, pn.prefix);        // 두 번째로 중요한 필드
+        if (result == 0) {
+          result = Short.compare(lineNum, pn.lineNum);    // 세 번째로 중요한 필드
+        }
+      }
+      return result;
+    }
+   
+    // Java 8 - 비교자 생성 메서드를 활용한 비교자 (위 방식보다 성능이 떨어짐)
+    private static final Comparator<PhoneNumber> COMPARATOR =
+            comparingInt((PhoneNumber pn) -> pn.areaCode)
+              .thenComparingInt(pn -> pn.prefix)
+              .thenComparingInt(pn -> pn.lineNum);
+  
+    public int compareTo(PhoneNumber pn) {
+      return COMPARATOR.compare(this, pn);
+    }  
+   ```
