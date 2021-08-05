@@ -9,7 +9,7 @@
 - [2장. 객체 생성과 파괴](./study-effective-java/chapter02/chapter02.md)
 - [3장. 모든 객체의 공통 메서드](./study-effective-java/chapter03/chapter03.md)
 - [4장. 클래스와 인터페이스](./study-effective-java/chapter04/chapter04.md)
-- [5장. 제네릭]
+- [5장. 제네릭](./study-effective-java/chapter05/chapter05.md)
 - [6장. 열거 타입과 애너테이션]
 - [7장. 람다와 스트림]
 - [8장. 메서드]
