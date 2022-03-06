@@ -10,7 +10,7 @@
 - [3장. 모든 객체의 공통 메서드](./study-effective-java/chapter03/chapter03.md)
 - [4장. 클래스와 인터페이스](./study-effective-java/chapter04/chapter04.md)
 - [5장. 제네릭](./study-effective-java/chapter05/chapter05.md)
-- [6장. 열거 타입과 애너테이션]
+- [6장. 열거 타입과 애너테이션](./study-effective-java/chapter06/chapter06.md)
 - [7장. 람다와 스트림]
 - [8장. 메서드]
 - [9장. 일반적인 프로그래밍 원칙]
